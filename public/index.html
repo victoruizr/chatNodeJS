@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: green; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: greenyellow; border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #93fc83; text-align: right; }
+      #messages li:nth-child(even) { background: #fff70d; text-align: left; }
+      #usuarios { list-style-type: none; margin: 0; padding: 0; }
+      #usuarios li { padding: 5px 10px; }
+      #usuarios li{ background: #2dff0d; text-align: center;  }
+      #estaescribiendo {color: red;}
+    
+    </style>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script> 
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/siofu/client.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script>
+
+        $(function () {
+
+          var usu = prompt('¿NikName?');
+          var socket = io();  
+           socket.emit('usuario', usu);
+            $('form').submit(function(e){
+                e.preventDefault(); // prevents page reloading
+
+                socket.emit('chat', $('#m').val());
+                $('#m').val('');
+                return false;
+            });
+
+            socket.on('chat', function(datos){
+                $('#messages').append($('<li>').text(datos.autor+': '+datos.mensajes));
+            });
+
+            socket.on('conectado', function(usuario){
+              console.log(usuario);
+             $('#usuarios').append($('<li id='+usuario+'>').text("Se ha conectado "+usuario)); 
+            });
+
+            socket.on('disconnect' , function(usuario){
+              $('#'+usuario).remove(); 
+            });
+            
+            var timeout=null
+            $('form').keypress(function(){
+              console.log(usu)
+              socket.emit('escribiendo', usu);
+              if(timeout){
+                clearTimeout(timeout);
+              }
+              timeout=setTimeout(() =>{
+              socket.emit('noescribiendo', usu);
+              },1000)
+            });
+            
+            socket.on('estaescribiendo', function(usuario){
+              $('#estaescribiendo').show();
+             $('#estaescribiendo').text("Esta escribiendo el ususario "+usuario); 
+             
+            });
+
+            socket.on('noestaescribiendo', function(usuario){
+              $('#estaescribiendo').hide(); 
+              
+             });
+
+             socket.on('archivo', function(archivo){
+              $('#messages').append($('<li><a href='+archivo.pathName+'>'+archivo.file.name+'</a>'));
+             })
+
+             var uploader = new SocketIOFileUpload(socket);
+            uploader.listenOnInput(document.getElementById("siofu_input"));
+        });
+    </script>
+  </head>
+  <body>
+    <div class="container-fluid" >
+        <div class="row">
+          <div class="col-sm">
+           <h1>USUARIOS CONECTADOS</h1>
+           <ul id="usuarios"></ul>
+          </div>
+          <div class="col-sm">
+            <H1>CHAT</H1>
+            <ul id="messages"></ul>
+            <div id="estaescribiendo"></div>
+          </div>
+        </div>
+    </div>  
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+      <input type="file" id="siofu_input" />
+    </form>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    </body>
+</html>
