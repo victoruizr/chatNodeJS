@@ -29,10 +29,12 @@ io.on('connection', function(socket){
                 console.log('message: ' + msg);
                 var datos = {
                     autor: usuario, 
-                    mensajes: msg
+                    mensajes: msg,
+                    id: usuario
+                  
                 };
 
-                io.emit('chat', datos);
+                io.emit('chat', datos, usuario);
 
             });
             socket.on('disconnect', function(){
