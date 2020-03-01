@@ -8,12 +8,10 @@ app.use(sioufu.router).use(express.static(__dirname+'/public/'))
 
 
 io.on('connection', function(socket){
-  console.log("Abierta conexion")  
   var uploader = new sioufu();
   uploader.dir = "./public/files";
 
   uploader.on("complete",function(e){
-    console.log("Envia archivo "+e.file.name)
     io.emit('archivo',e)
   })
   uploader.listen(socket)
@@ -21,12 +19,10 @@ io.on('connection', function(socket){
   
 
   socket.on('usuario', function(usuario){
-        console.log('a user connected');
         io.emit('conectado', usuario);
 
          if (usuario != ''){
             socket.on('chat', function(msg){
-                console.log('message: ' + msg);
                 var datos = {
                     autor: usuario, 
                     mensajes: msg,
@@ -38,7 +34,6 @@ io.on('connection', function(socket){
 
             });
             socket.on('disconnect', function(){
-              console.log("Desconectado"+usuario);  
                 io.emit('disconnect',usuario)
           });
         }
@@ -47,12 +42,10 @@ io.on('connection', function(socket){
 
 
     socket.on('escribiendo', function(usuario){
-      console.log("escribiendo");
       io.emit("estaescribiendo",usuario)
     });
 
     socket.on('noescribiendo', function(usuario){
-      console.log("noescribiendo");
       io.emit("noestaescribiendo",usuario)
     });
 
