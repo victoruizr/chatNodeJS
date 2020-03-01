@@ -125,6 +125,8 @@
         });
 
         socket.on("archivo", function(archivo) {
+          console.log(archivo)
+          alert("ADVERTENCIA -->En caso de añadir archivos con mas de una palabra unirlos por guion o guion bajo" )
           $("#messages").append(
             $("<li ><a href=./files/"+archivo.file.name+">" + archivo.file.name +"</a>"));
         });
@@ -150,10 +152,27 @@
         </div>
       </div>
     </div>
+
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
       <input type="file" id="siofu_input" />
     </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
