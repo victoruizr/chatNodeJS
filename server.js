@@ -51,11 +51,6 @@ io.on('connection', function(socket){
 
 });
 
-/* SUBIDA ARCHIVOS */
-
-
-
-
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
